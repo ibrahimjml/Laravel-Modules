@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ eventNamespace }};
+
+class {{ class }}
+{
+    public function handle({{ event }} $event): void
+    {
+        //
+    }
+}

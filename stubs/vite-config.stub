@@ -1,0 +1,30 @@
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+    build: {
+        outDir: '../../public/build-{{ lower }}',
+        emptyOutDir: true,
+        manifest: true,
+    },
+    plugins: [
+        laravel({
+            publicDirectory: '../../public',
+            buildDirectory: 'build-{{ lower }}',
+            input: [
+                'Resources/assets/css/{{ lower }}.css',
+                'Resources/assets/js/{{ lower }}.js',
+            ],
+            refresh: true,
+        }),
+        tailwindcss(),
+    ],
+});
+
+// Consumed by the root "vite-module.js" collector so the main app build also
+// compiles this module's assets alongside resources/js/app.js.
+export const paths = [
+    'Modules/{{ studly }}/Resources/assets/css/{{ lower }}.css',
+    'Modules/{{ studly }}/Resources/assets/js/{{ lower }}.js',
+];

@@ -1,0 +1,10 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('api')
+    ->prefix('api/{{ lower }}')
+    ->name('api.{{ lower }}.')
+    ->group(function (): void {
+        //
+    });

@@ -1,0 +1,8 @@
+{
+    "name": "{{ studly }}",
+    "description": "",
+    "version": "1.0.0",
+    "providers": [
+        "{{ namespace }}\\{{ studly }}\\Providers\\{{ studly }}ServiceProvider"
+    ]
+}

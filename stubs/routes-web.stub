@@ -1,0 +1,10 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('web')
+    ->prefix('{{ lower }}')
+    ->name('{{ lower }}.')
+    ->group(function (): void {
+        //
+    });

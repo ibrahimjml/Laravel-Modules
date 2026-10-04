@@ -1,0 +1,26 @@
+<?php
+
+namespace {{ namespace }}\{{ studly }}\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class {{ studly }}ServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../Config/config.php', '{{ lower }}');
+    }
+
+    public function boot(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                //
+            ]);
+
+            $this->publishes([
+                __DIR__.'/../Config/config.php' => config_path('{{ lower }}.php'),
+            ], '{{ lower }}-config');
+        }
+    }
+}
