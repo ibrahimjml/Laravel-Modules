@@ -30,7 +30,7 @@ class ModuleMakeCommand extends Command
         foreach ([
             'Config', 'Console', 'Database/Migrations', 'Database/Seeders', 'Database/Factories',
             'Http/Controllers', 'Http/Requests', 'Http/Middleware', 'Models', 'Providers',
-            'Events', 'Listeners', 'Observers', 'Policies', 'Enums', 'Traits', 'Services',
+            'Actions', 'Events', 'Listeners', 'Observers', 'Policies', 'Enums', 'Traits', 'Services',
             'Resources/views', 'Resources/lang/en', 'Resources/assets/js', 'Resources/assets/css', 'Routes',
         ] as $directory) {
             File::ensureDirectoryExists("{$path}/{$directory}");

@@ -2,12 +2,14 @@
 
 namespace Ibrahimjml\LaravelModules;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Ibrahimjml\LaravelModules\Console\ModuleDisableCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleEnableCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleListCommand;
+use Ibrahimjml\LaravelModules\Console\ModuleMakeActionCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeCommandCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeControllerCommand;
@@ -17,6 +19,7 @@ use Ibrahimjml\LaravelModules\Console\ModuleMakeJobCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeListenerCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeMailCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeMigrationCommand;
+use Ibrahimjml\LaravelModules\Console\ModuleMakeMiddlewareCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeModelCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeNotificationCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMakeObserverCommand;
@@ -32,6 +35,7 @@ use Ibrahimjml\LaravelModules\Console\ModuleMigrateResetCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMigrateRollbackCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleMigrateStatusCommand;
 use Ibrahimjml\LaravelModules\Console\ModuleSeedCommand;
+use Ibrahimjml\LaravelModules\Database\ModuleMigrator;
 
 class ModuleServiceProvider extends ServiceProvider
 {
@@ -40,6 +44,7 @@ class ModuleServiceProvider extends ServiceProvider
      */
     private array $commands = [
         ModuleMakeCommand::class,
+        ModuleMakeActionCommand::class,
         ModuleMakeControllerCommand::class,
         ModuleMakeModelCommand::class,
         ModuleMakeRequestCommand::class,
@@ -47,6 +52,7 @@ class ModuleServiceProvider extends ServiceProvider
         ModuleMakeSeederCommand::class,
         ModuleMakeCommandCommand::class,
         ModuleMakeMigrationCommand::class,
+        ModuleMakeMiddlewareCommand::class,
         ModuleMakeServiceCommand::class,
         ModuleMakeTraitCommand::class,
         ModuleMakeEventCommand::class,
@@ -75,6 +81,13 @@ class ModuleServiceProvider extends ServiceProvider
         $this->app->singleton(ModuleManager::class, fn (): ModuleManager => new ModuleManager(
             config('modules.path'),
             config('modules.statuses_file'),
+        ));
+
+        $this->app->bind(ModuleMigrator::class, fn (Application $app): ModuleMigrator => new ModuleMigrator(
+            $app['migrator'],
+            $app['db'],
+            $app['files'],
+            $app['events'],
         ));
 
         foreach ($this->manager()->enabled() as $module) {

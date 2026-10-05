@@ -3,19 +3,24 @@
 namespace Ibrahimjml\LaravelModules\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\File;
+use Ibrahimjml\LaravelModules\Database\ModuleMigrator;
 use Ibrahimjml\LaravelModules\ModuleManager;
 
 class ModuleMigrateRefreshCommand extends Command
 {
+    use ConfirmableTrait;
+
     protected $signature = 'module:migrate-refresh
         {module? : The module name}
+        {--step=0 : The number of migrations to revert and re-run}
         {--seed : Seed the database after refreshing}
         {--force : Force the operation to run when in production}';
 
     protected $description = "Rollback and re-run a module's database migrations";
 
-    public function handle(ModuleManager $manager): int
+    public function handle(ModuleManager $manager, ModuleMigrator $migrator): int
     {
         $modules = $this->argument('module')
             ? collect([$manager->find($this->argument('module'))])->filter()
@@ -24,6 +29,10 @@ class ModuleMigrateRefreshCommand extends Command
         if ($modules->isEmpty()) {
             $this->components->error('No matching modules found.');
 
+            return self::FAILURE;
+        }
+
+        if (! $this->confirmToProceed()) {
             return self::FAILURE;
         }
 
@@ -36,10 +45,23 @@ class ModuleMigrateRefreshCommand extends Command
 
             $this->components->info("Refreshing module [{$module->name}] migrations");
 
-            $this->call('migrate:refresh', [
+            $moduleMigrator = $migrator->scopedTo($path);
+
+            $moduleMigrator->setOutput($this->output);
+
+            if ((int) $this->option('step') > 0) {
+                $moduleMigrator->rollback($path, [
+                    'step' => (int) $this->option('step'),
+                    'batch' => 0,
+                ]);
+            } else {
+                $moduleMigrator->reset($path);
+            }
+
+            $this->call('migrate', [
                 '--path' => str_replace(base_path().DIRECTORY_SEPARATOR, '', $path),
                 '--realpath' => false,
-                '--force' => (bool) $this->option('force'),
+                '--force' => true,
             ]);
 
             if ($this->option('seed')) {
